@@ -1,3 +1,2 @@
 language: java
-script: mvn test
-  nvm checkstyle:check
+script: nvm checkstyle:check
