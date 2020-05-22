@@ -54,10 +54,6 @@ public class Invoice {
     }
 
     public void print() {
-//        printWriter.println("Kubek, Szt: 2, Cena: 5");
-//        printWriter.println("Kozi Serek, Szt: 3, Cena: 10");
-//        printWriter.println("Pinezka, Szt: 1000, Cena: 0.01");
-//        printWriter.println("Liczba pozycji: 3");
         int itemsCounter = 0;
         System.out.println("Faktura nr: " + this.invoiceNumber);
         for (Product product : products.keySet()) {
