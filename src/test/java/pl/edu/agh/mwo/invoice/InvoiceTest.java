@@ -1,5 +1,9 @@
 package pl.edu.agh.mwo.invoice;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 
 import org.hamcrest.Matchers;
@@ -12,6 +16,8 @@ import pl.edu.agh.mwo.invoice.product.DairyProduct;
 import pl.edu.agh.mwo.invoice.product.OtherProduct;
 import pl.edu.agh.mwo.invoice.product.Product;
 import pl.edu.agh.mwo.invoice.product.TaxFreeProduct;
+
+import static org.junit.Assert.assertEquals;
 
 public class InvoiceTest {
     private Invoice invoice;
@@ -122,6 +128,25 @@ public class InvoiceTest {
     public void testTwoInvoicesHaveConsequentNumbers() {
         int number = invoice.getNumber();
         int number2 = new Invoice().getNumber();
-        Assert.assertEquals(number, number2 - 1);
+        assertEquals(number, number2 - 1);
+    }
+    @Test
+    public void testInvoicePrint() throws Exception {
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        invoice.addProduct(new TaxFreeProduct("Kubek", new BigDecimal("5")), 2);
+        invoice.addProduct(new DairyProduct("Kozi Serek", new BigDecimal("10")), 3);
+        invoice.addProduct(new OtherProduct("Pinezka", new BigDecimal("0.01")), 1000);
+        invoice.print();
+        StringWriter expectedStringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(expectedStringWriter);
+        printWriter.println("Faktura nr: " + invoice.getNumber());
+        printWriter.println("Kubek, Szt: 2, Cena: 5");
+        printWriter.println("Kozi Serek, Szt: 3, Cena: 10");
+        printWriter.println("Pinezka, Szt: 1000, Cena: 0.01");
+        printWriter.println("Liczba pozycji: 3");
+        printWriter.close();
+        String expected = expectedStringWriter.toString();
+        assertEquals(expected.trim(), outContent.toString().trim());
     }
 }
