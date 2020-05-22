@@ -24,7 +24,16 @@ public class Invoice {
         if (product == null || quantity <= 0) {
             throw new IllegalArgumentException();
         }
-        products.put(product, quantity);
+        boolean productAlreadyExits = false;
+        for (Product existingProduct : products.keySet()) {
+            if (product.getName().equals(existingProduct.getName())) {
+                products.computeIfPresent(existingProduct, (k, v) -> v + quantity);
+                productAlreadyExits = true;
+            }
+        }
+        if (!productAlreadyExits) {
+            products.put(product, quantity);
+        }
     }
 
     public BigDecimal getNetTotal() {
