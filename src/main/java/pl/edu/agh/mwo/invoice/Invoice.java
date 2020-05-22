@@ -3,7 +3,6 @@ package pl.edu.agh.mwo.invoice;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import pl.edu.agh.mwo.invoice.product.Product;
 
 public class Invoice {
@@ -24,14 +23,14 @@ public class Invoice {
         if (product == null || quantity <= 0) {
             throw new IllegalArgumentException();
         }
-        boolean productAlreadyExits = false;
+        boolean productAlreadyExist = false;
         for (Product existingProduct : products.keySet()) {
             if (product.getName().equals(existingProduct.getName())) {
                 products.computeIfPresent(existingProduct, (k, v) -> v + quantity);
-                productAlreadyExits = true;
+                productAlreadyExist = true;
             }
         }
-        if (!productAlreadyExits) {
+        if (!productAlreadyExist) {
             products.put(product, quantity);
         }
     }
@@ -66,7 +65,8 @@ public class Invoice {
         int itemsCounter = 0;
         System.out.println("Faktura nr: " + this.invoiceNumber);
         for (Product product : products.keySet()) {
-            System.out.println(product.getName() + ", Szt: " + products.get(product) + ", Cena: " + product.getPrice());
+            System.out.println(product.getName() + ", Szt: "
+                    + products.get(product) + ", Cena: " + product.getPrice());
             itemsCounter++;
         }
         System.out.println("Liczba pozycji: " + itemsCounter);
