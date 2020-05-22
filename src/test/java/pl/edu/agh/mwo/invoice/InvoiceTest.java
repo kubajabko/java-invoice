@@ -5,6 +5,9 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -12,10 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import pl.edu.agh.mwo.invoice.Invoice;
-import pl.edu.agh.mwo.invoice.product.DairyProduct;
-import pl.edu.agh.mwo.invoice.product.OtherProduct;
-import pl.edu.agh.mwo.invoice.product.Product;
-import pl.edu.agh.mwo.invoice.product.TaxFreeProduct;
+import pl.edu.agh.mwo.invoice.product.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -168,5 +168,31 @@ public class InvoiceTest {
         printWriter.close();
         String expected = expectedStringWriter.toString();
         assertEquals(expected.trim(), outContent.toString().trim());
+    }
+    @Test
+    public void testBottleOfWine() throws  Exception {
+        invoice.addProduct(new Alcohol("Wino", new BigDecimal("20")), 2);
+        invoice.addProduct(new TaxFreeProduct("Kubek", new BigDecimal("5")), 1);
+        Assert.assertThat(new BigDecimal("65.32"), Matchers.comparesEqualTo(invoice.getGrossTotal()));
+    }
+    @Test
+    public void testFuelCanisterDateOK() throws  Exception {
+        invoice.addProduct(new LiquidFuel("KanisterBenzyny", new BigDecimal("100")), 1);
+        invoice.addProduct(new TaxFreeProduct("Kubek", new BigDecimal("5")), 1);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
+        ParsePosition pp1 = new ParsePosition(0);
+        Date TransportDayDate = sdf.parse("26/04", pp1);
+        invoice.setInvoiceDate(TransportDayDate);
+        Assert.assertThat(new BigDecimal("110.56"), Matchers.comparesEqualTo(invoice.getGrossTotal()));
+    }
+    @Test
+    public void testFuelCanisterDateNOK() throws  Exception {
+        invoice.addProduct(new LiquidFuel("KanisterBenzyny", new BigDecimal("100")), 1);
+        invoice.addProduct(new TaxFreeProduct("Kubek", new BigDecimal("5")), 1);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
+        ParsePosition pp1 = new ParsePosition(0);
+        Date DefinitelyNotTransportDayDate = sdf.parse("05/05", pp1);
+        invoice.setInvoiceDate(DefinitelyNotTransportDayDate);
+        Assert.assertThat(new BigDecimal("133.56"), Matchers.comparesEqualTo(invoice.getGrossTotal()));
     }
 }
